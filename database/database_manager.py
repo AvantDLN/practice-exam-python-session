@@ -5,22 +5,22 @@ class DatabaseManager:
     def __init__(self, db_path='database/tasks.db'):
         self.db_path = db_path
         self.connection = None
-        
+
     def connect(self):
         self.connection = sqlite3.connect(self.db_path)
         self.connection.row_factory = sqlite3.Row
         return self.connection
-    
+
     def close(self):
         if self.connection:
             self.connection.close()
             self.connection = None
 
     def create_tables(self):
-    self.create_task_table()
-    self.create_project_table()
-    self.create_user_table()
-    
+        self.create_task_table()
+        self.create_project_table()
+        self.create_user_table()
+
     def create_task_table(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -38,20 +38,20 @@ class DatabaseManager:
         ''')
         conn.commit()
         self.close()
-    
+
     def add_task(self, task):
         conn = self.connect()
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO tasks (title, description, priority, status, due_date, project_id, assignee_id)
             VALUES (?, ?, ?, ?, ?, ?, ?)
-        ''', (task.title, task.description, task.priority, task.status, 
+        ''', (task.title, task.description, task.priority, task.status,
               task.due_date.isoformat(), task.project_id, task.assignee_id))
         conn.commit()
         task.id = cursor.lastrowid
         self.close()
         return task.id
-    
+
     def get_task_by_id(self, task_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -59,7 +59,7 @@ class DatabaseManager:
         row = cursor.fetchone()
         self.close()
         return dict(row) if row else None
-    
+
     def get_all_tasks(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -67,7 +67,7 @@ class DatabaseManager:
         rows = cursor.fetchall()
         self.close()
         return [dict(row) for row in rows]
-    
+
     def update_task(self, task_id, **kwargs):
         conn = self.connect()
         cursor = conn.cursor()
@@ -84,7 +84,7 @@ class DatabaseManager:
         conn.commit()
         self.close()
         return cursor.rowcount > 0
-    
+
     def delete_task(self, task_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -92,18 +92,18 @@ class DatabaseManager:
         conn.commit()
         self.close()
         return cursor.rowcount > 0
-    
+
     def search_tasks(self, query):
         conn = self.connect()
         cursor = conn.cursor()
         cursor.execute('''
-            SELECT * FROM tasks 
+            SELECT * FROM tasks
             WHERE title LIKE ? OR description LIKE ?
         ''', (f'%{query}%', f'%{query}%'))
         rows = cursor.fetchall()
         self.close()
         return [dict(row) for row in rows]
-    
+
     def get_tasks_by_project(self, project_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -111,7 +111,7 @@ class DatabaseManager:
         rows = cursor.fetchall()
         self.close()
         return [dict(row) for row in rows]
-    
+
     def get_tasks_by_user(self, user_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -119,7 +119,7 @@ class DatabaseManager:
         rows = cursor.fetchall()
         self.close()
         return [dict(row) for row in rows]
-    
+
     def create_project_table(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -135,7 +135,7 @@ class DatabaseManager:
         ''')
         conn.commit()
         self.close()
-    
+
     def add_project(self, project):
         conn = self.connect()
         cursor = conn.cursor()
@@ -148,7 +148,7 @@ class DatabaseManager:
         project.id = cursor.lastrowid
         self.close()
         return project.id
-    
+
     def get_project_by_id(self, project_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -156,7 +156,7 @@ class DatabaseManager:
         row = cursor.fetchone()
         self.close()
         return dict(row) if row else None
-    
+
     def get_all_projects(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -164,7 +164,7 @@ class DatabaseManager:
         rows = cursor.fetchall()
         self.close()
         return [dict(row) for row in rows]
-    
+
     def update_project(self, project_id, **kwargs):
         conn = self.connect()
         cursor = conn.cursor()
@@ -181,7 +181,7 @@ class DatabaseManager:
         conn.commit()
         self.close()
         return cursor.rowcount > 0
-    
+
     def delete_project(self, project_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -189,7 +189,7 @@ class DatabaseManager:
         conn.commit()
         self.close()
         return cursor.rowcount > 0
-    
+
     def create_user_table(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -204,7 +204,7 @@ class DatabaseManager:
         ''')
         conn.commit()
         self.close()
-    
+
     def add_user(self, user):
         conn = self.connect()
         cursor = conn.cursor()
@@ -216,7 +216,7 @@ class DatabaseManager:
         user.id = cursor.lastrowid
         self.close()
         return user.id
-    
+
     def get_user_by_id(self, user_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -224,7 +224,7 @@ class DatabaseManager:
         row = cursor.fetchone()
         self.close()
         return dict(row) if row else None
-    
+
     def get_all_users(self):
         conn = self.connect()
         cursor = conn.cursor()
@@ -232,7 +232,7 @@ class DatabaseManager:
         rows = cursor.fetchall()
         self.close()
         return [dict(row) for row in rows]
-    
+
     def update_user(self, user_id, **kwargs):
         conn = self.connect()
         cursor = conn.cursor()
@@ -248,7 +248,7 @@ class DatabaseManager:
         conn.commit()
         self.close()
         return cursor.rowcount > 0
-    
+
     def delete_user(self, user_id):
         conn = self.connect()
         cursor = conn.cursor()
@@ -256,4 +256,3 @@ class DatabaseManager:
         conn.commit()
         self.close()
         return cursor.rowcount > 0
-
